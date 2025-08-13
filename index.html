@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNPトレカ交流会 - 参加登録</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #4a5568;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .event-details {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .event-details p {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .event-details strong {
+            color: #2d3748;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .register-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .register-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .confirmation {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .confirmation.show {
+            display: block;
+        }
+        
+        .note {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CNPトレカ交流会</h1>
+            <p>参加登録フォーム</p>
+        </div>
+        
+        <div class="content">
+            <div class="event-details">
+                <p><strong>日時：</strong>9月14日（日）14:00–16:00（出入り自由）</p>
+                <p><strong>会場：</strong>籠池地域福祉センター</p>
+                <p><strong>住所：</strong>〒651-0053 神戸市中央区籠池通2丁目1-5</p>
+                <p><strong>定員：</strong>お子様10名（親子参加大歓迎！）</p>
+                <p><strong>参加費：</strong>無料</p>
+                <p><strong>内容：</strong>お子様にはCNPトレカスターターパック（モノリス株式会社提供）を無料配布し、みんなでカードを使って遊びます。</p>
+            </div>
+            
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="nickname">名前（ニックネームでも可）</label>
+                    <input type="text" id="nickname" name="nickname" required placeholder="お名前を入力してください">
+                </div>
+                
+                <button type="submit" class="register-btn" id="submitBtn">参加登録する</button>
+            </form>
+            
+            <div class="confirmation" id="confirmation">
+                <h3 style="color: #38a169; margin-bottom: 10px;">✅ 登録完了！</h3>
+                <p><strong id="confirmedName"></strong>さんの参加登録を受け付けました。<br>当日お待ちしております！</p>
+            </div>
+            
+            <p class="note">
+                EmailJSを使用してメール送信機能を実装済みです。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // EmailJS初期化
+        (function(){
+            emailjs.init("gb2_akVkEYTf3Sz-C");
+        })();
+
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('nickname').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const confirmation = document.getElementById('confirmation');
+            
+            if (!nickname) {
+                alert('お名前を入力してください。');
+                return;
+            }
+            
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '送信中...';
+            
+            // EmailJSでメール送信
+            const templateParams = {
+                participant_name: nickname,
+                event_name: 'CNPトレカ交流会',
+                event_date: '9月14日（日）14:00–16:00（出入り自由）',
+                venue: '籠池地域福祉センター（〒651-0053 神戸市中央区籠池通2丁目1-5）',
+                to_email: 'sumitomo_kenji@yahoo.co.jp'
+            };
+            
+            emailjs.send('service_cmb4kir', 'template_7sdv4vm', templateParams)
+                .then(function(response) {
+                    console.log('メール送信成功:', response.status, response.text);
+                    // Show confirmation with name
+                    document.getElementById('confirmedName').textContent = nickname;
+                    document.getElementById('registrationForm').style.display = 'none';
+                    confirmation.classList.add('show');
+                }, function(error) {
+                    console.error('メール送信エラー:', error);
+                    alert('送信に失敗しました。もう一度お試しください。');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '参加登録する';
+                });
+        });
+    </script>
+</body>
+</html>
